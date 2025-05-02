@@ -1,4 +1,4 @@
-eature: Login Feature
+Feature: Login Feature
 
   Scenario: Successful login
     Given user is on login page
