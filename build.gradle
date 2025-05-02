@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.ananurbaiti'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.31.0'
+    implementation 'org.kohsuke:github-api:2.0-rc.3'
+    implementation 'io.cucumber:cucumber-java:7.22.1'
+
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'io.cucumber:cucumber-junit:7.22.1'
+    testImplementation 'io.rest-assured:rest-assured:5.5.0'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.ananurbaiti.BelajarGradle'
+        )
+    }
+}
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+tasks.register('runCucumber', JavaExec) {
+    description = 'Run Cucumber tests'
+    group = 'verification'
+    classpath = configurations.cucumberRuntime + sourceSets.main.get().output + sourceSets.test.get().output
+    mainClass.set('io.cucumber.core.cli.Main')
+    args = [
+            '--plugin', 'pretty',
+            '--plugin', 'html:reports/test-report',
+            '--glue', 'step_definitions',
+            'src/test/resources'
+    ]
+    dependsOn(tasks.named('testClasses'))
+}
+
+task greetingTask {
+    doLast {
+        String nama = project.hasProperty('nama') ? project.property('nama') : 'Gradle User'
+        println "Hello, $nama! Welcome to Gradle World!"
+    }
+}
+
